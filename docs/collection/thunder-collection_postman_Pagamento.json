@@ -1,0 +1,116 @@
+{
+    "info": {
+        "_postman_id": "fe8f4e6b-ff5b-408f-8d8d-1813271b880e",
+        "name": "Pagamento",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": ""
+    },
+    "item": [
+        {
+            "name": "Get all",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:8000/pagamento",
+                    "path": [
+                        "pagamento"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                }
+            }
+        },
+        {
+            "name": "Get by id",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:8000/pagamento/da1871af-c521-4ec7-933b-67f0f956464d",
+                    "path": [
+                        "pagamento",
+                        "da1871af-c521-4ec7-933b-67f0f956464d"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                }
+            }
+        },
+        {
+            "name": "Create",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:8000/pagamento",
+                    "path": [
+                        "pagamento"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"pedido_id\": 1\n}"
+                }
+            }
+        },
+        {
+            "name": "Update",
+            "request": {
+                "method": "PUT",
+                "url": {
+                    "raw": "http://localhost:8000/pagamento/da1871af-c521-4ec7-933b-67f0f956464d",
+                    "path": [
+                        "pagamento",
+                        "da1871af-c521-4ec7-933b-67f0f956464d"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"status\": \"1\"\n}"
+                }
+            }
+        },
+        {
+            "name": "Delete",
+            "request": {
+                "method": "DELETE",
+                "url": {
+                    "raw": "http://localhost:8000/pagamento/da1871af-c521-4ec7-933b-67f0f956464d",
+                    "path": [
+                        "pagamento",
+                        "da1871af-c521-4ec7-933b-67f0f956464d"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                }
+            }
+        }
+    ]
+}

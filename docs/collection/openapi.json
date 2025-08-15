@@ -1,0 +1,1946 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Sistema de Autoatendimento da Lanchonete",
+        "description": "Documentacao automatica via Swagger e Redoc",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/health/": {
+            "get": {
+                "tags": ["health"],
+                "summary": "Health Check",
+                "operationId": "health_check_health__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/health/db": {
+            "get": {
+                "tags": ["health"],
+                "summary": "Health Db Check",
+                "operationId": "health_db_check_health_db_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/clientes/": {
+            "get": {
+                "tags": ["clientes"],
+                "summary": "Listar Clientes",
+                "operationId": "listar_clientes_clientes__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/ClienteResponseSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Listar Clientes Clientes  Get"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": ""
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["clientes"],
+                "summary": "Criar Cliente",
+                "operationId": "criar_cliente_clientes__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClienteCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClienteResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao criar cliente"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/clientes/cpf/{cpf}": {
+            "get": {
+                "tags": ["clientes"],
+                "summary": "Buscar Cliente Por Cpf",
+                "operationId": "buscar_cliente_por_cpf_clientes_cpf__cpf__get",
+                "parameters": [{
+                    "name": "cpf",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "title": "Cpf"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClienteResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Cliente não encontrado"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": ""
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/clientes/{cliente_id}": {
+            "get": {
+                "tags": ["clientes"],
+                "summary": "Buscar Cliente",
+                "operationId": "buscar_cliente_clientes__cliente_id__get",
+                "parameters": [{
+                    "name": "cliente_id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer",
+                        "title": "Cliente Id"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClienteResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Cliente não encontrado"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": ""
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["clientes"],
+                "summary": "Atualizar Cliente",
+                "operationId": "atualizar_cliente_clientes__cliente_id__put",
+                "parameters": [{
+                    "name": "cliente_id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer",
+                        "title": "Cliente Id"
+                    }
+                }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClienteUpdateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClienteResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Cliente não encontrado"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao atualizar o cliente"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["clientes"],
+                "summary": "Deletar Cliente",
+                "operationId": "deletar_cliente_clientes__cliente_id__delete",
+                "parameters": [{
+                    "name": "cliente_id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer",
+                        "title": "Cliente Id"
+                    }
+                }],
+                "responses": {
+                    "204": {
+                        "description": "Pedido deletado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "example": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Cliente não encontrado"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao deletar o cliente"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/pagamento/": {
+            "get": {
+                "tags": ["pagamento"],
+                "summary": "Listar todos os pagamentos realizado",
+                "operationId": "listar_pagamentos_pagamento__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/PagamentoResponseSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Listar Pagamentos Pagamento  Get"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao buscar os pagamentos"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["pagamento"],
+                "summary": "Criar pagamento do pedido",
+                "operationId": "efetuar_pagamento_pedido_pagamento__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PagamentoCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PagamentoResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao salvar o pagamento"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/pagamento/{codigo_pagamento}": {
+            "get": {
+                "tags": ["pagamento"],
+                "summary": "Buscar Pagamento",
+                "operationId": "buscar_pagamento_pagamento__codigo_pagamento__get",
+                "parameters": [{
+                    "name": "codigo_pagamento",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "title": "Codigo Pagamento"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PagamentoResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao buscar o pagamento"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Pagamento não encontrado"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["pagamento"],
+                "summary": "Atualizar Pagamento",
+                "operationId": "atualizar_pagamento_pagamento__codigo_pagamento__put",
+                "parameters": [{
+                    "name": "codigo_pagamento",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "title": "Codigo Pagamento"
+                    }
+                }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PagamentoAtualizaSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PagamentoResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Pagamento não encontrado"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao atualizar o pagamento"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["pagamento"],
+                "summary": "Deletar Pagamento",
+                "operationId": "deletar_pagamento_pagamento__codigo_pagamento__delete",
+                "parameters": [{
+                    "name": "codigo_pagamento",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "title": "Codigo Pagamento"
+                    }
+                }],
+                "responses": {
+                    "204": {
+                        "description": "Pagamento deletado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "example": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Pagamento não encontrado"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao remover o pagamento"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/pedidos/": {
+            "get": {
+                "tags": ["pedidos"],
+                "summary": "Listar Pedidos",
+                "operationId": "listar_pedidos_pedidos__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/PedidoResponseSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Listar Pedidos Pedidos  Get"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": ""
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["pedidos"],
+                "summary": "Criar Pedido",
+                "operationId": "criar_pedido_pedidos__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PedidoCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PedidoProdutosResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao salvar o pedido | Erro de integridade ao salvar produtos no pedido"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/pedidos/{pedido_id}": {
+            "get": {
+                "tags": ["pedidos"],
+                "summary": "Buscar Pedido",
+                "operationId": "buscar_pedido_pedidos__pedido_id__get",
+                "parameters": [{
+                    "name": "pedido_id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer",
+                        "title": "Pedido Id"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PedidoProdutosResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Pedido não encontrado | Produto(s) do pedido não encontrado(s)"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": ""
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["pedidos"],
+                "summary": "Atualizar Pedido",
+                "operationId": "atualizar_pedido_pedidos__pedido_id__put",
+                "parameters": [{
+                    "name": "pedido_id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer",
+                        "title": "Pedido Id"
+                    }
+                }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PedidoAtualizaSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PedidoResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Pedido não encontrado"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Pedido já finalizado"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["pedidos"],
+                "summary": "Deletar Pedido",
+                "operationId": "deletar_pedido_pedidos__pedido_id__delete",
+                "parameters": [{
+                    "name": "pedido_id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer",
+                        "title": "Pedido Id"
+                    }
+                }],
+                "responses": {
+                    "204": {
+                        "description": "Pedido deletado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "example": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Pedido não encontrado"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao deletar o pedido"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/": {
+            "get": {
+                "tags": ["produtos"],
+                "summary": "Listar Produtos",
+                "operationId": "listar_produtos_produtos__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/ProdutoResponseSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Listar Produtos Produtos  Get"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao buscar os produtos"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["produtos"],
+                "summary": "Criar Produto",
+                "operationId": "criar_produto_produtos__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProdutoCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProdutoResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao criar o produto"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/categoria/{categoria}": {
+            "get": {
+                "tags": ["produtos"],
+                "summary": "Listar Produtos Por Categoria",
+                "operationId": "listar_produtos_por_categoria_produtos_categoria__categoria__get",
+                "parameters": [{
+                    "name": "categoria",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer",
+                        "title": "Categoria"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ProdutoResponseSchema"
+                                    },
+                                    "title": "Response Listar Produtos Por Categoria Produtos Categoria  Categoria  Get"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao buscar o produto"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/{produto_id}": {
+            "get": {
+                "tags": ["produtos"],
+                "summary": "Buscar Produto",
+                "operationId": "buscar_produto_produtos__produto_id__get",
+                "parameters": [{
+                    "name": "produto_id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer",
+                        "title": "Produto Id"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProdutoResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao buscar o produto"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Produto não encontrado"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["produtos"],
+                "summary": "Atualizar Produto",
+                "operationId": "atualizar_produto_produtos__produto_id__put",
+                "parameters": [{
+                    "name": "produto_id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer",
+                        "title": "Produto Id"
+                    }
+                }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProdutoUpdateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProdutoResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Produto não encontrado"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao atualizar o produto"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["produtos"],
+                "summary": "Deletar Produto",
+                "operationId": "deletar_produto_produtos__produto_id__delete",
+                "parameters": [{
+                    "name": "produto_id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer",
+                        "title": "Produto Id"
+                    }
+                }],
+                "responses": {
+                    "204": {
+                        "description": "Produto deletado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "example": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Produto não encontrado"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao remover o produto"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/status_pedido/": {
+            "get": {
+                "tags": ["status_pedido"],
+                "summary": "Listar Todos",
+                "operationId": "listar_todos_status_pedido__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/StatusPedidoResponseSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Listar Todos Status Pedido  Get"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao buscar os statuses"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["status_pedido"],
+                "summary": "Criar",
+                "operationId": "criar_status_pedido__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StatusPedidoCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StatusPedidoResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao criar o status"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/status_pedido/{id}": {
+            "get": {
+                "tags": ["status_pedido"],
+                "summary": "Buscar Status",
+                "operationId": "buscar_status_status_pedido__id__get",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer",
+                        "title": "Id"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StatusPedidoResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao buscar o status"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Status não encontrado"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["status_pedido"],
+                "summary": "Atualizar",
+                "operationId": "atualizar_status_pedido__id__put",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer",
+                        "title": "Id"
+                    }
+                }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StatusPedidoUpdateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StatusPedidoResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Status não encontrado"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao atualizar o status"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["status_pedido"],
+                "summary": "Deletar",
+                "operationId": "deletar_status_pedido__id__delete",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer",
+                        "title": "Id"
+                    }
+                }],
+                "responses": {
+                    "204": {
+                        "description": "Status deletado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "example": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Status não encontrado"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao excluir o status"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/webhook/update-payment": {
+            "post": {
+                "tags": ["webhook"],
+                "summary": "Atualizar Pagamento",
+                "operationId": "atualizar_pagamento_webhook_update_payment_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PagamentoAtualizaWebhookSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PagamentoResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Pagamento não encontrado"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Erro de integridade ao atualizar o pagamento"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CategoriaProdutoEnum": {
+                "type": "string",
+                "enum": ["1", "2", "3", "4"],
+                "title": "CategoriaProdutoEnum"
+            },
+            "CategoriaProdutoResponseSchema": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "nome": {
+                        "type": "string",
+                        "title": "Nome"
+                    }
+                },
+                "type": "object",
+                "required": ["id", "nome"],
+                "title": "CategoriaProdutoResponseSchema"
+            },
+            "ClienteCreateSchema": {
+                "properties": {
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "minLength": 3,
+                        "title": "Nome"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "title": "Email"
+                    },
+                    "telefone": {
+                        "anyOf": [{
+                            "type": "string",
+                            "maxLength": 11,
+                            "minLength": 10,
+                            "pattern": "^\\d{10,11}$"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Telefone"
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "maxLength": 11,
+                        "minLength": 11,
+                        "pattern": "^\\d{11}$",
+                        "title": "Cpf"
+                    }
+                },
+                "type": "object",
+                "required": ["nome", "email", "cpf"],
+                "title": "ClienteCreateSchema"
+            },
+            "ClienteResponseSchema": {
+                "properties": {
+                    "cliente_id": {
+                        "type": "integer",
+                        "title": "Cliente Id"
+                    },
+                    "nome": {
+                        "anyOf": [{
+                            "type": "string"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Nome"
+                    },
+                    "email": {
+                        "anyOf": [{
+                            "type": "string"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Email"
+                    },
+                    "telefone": {
+                        "anyOf": [{
+                            "type": "string"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Telefone"
+                    },
+                    "cpf": {
+                        "anyOf": [{
+                            "type": "string"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Cpf"
+                    }
+                },
+                "type": "object",
+                "required": ["cliente_id", "nome", "email", "telefone", "cpf"],
+                "title": "ClienteResponseSchema"
+            },
+            "ClienteUpdateSchema": {
+                "properties": {
+                    "nome": {
+                        "anyOf": [{
+                            "type": "string",
+                            "maxLength": 100,
+                            "minLength": 3
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Nome"
+                    },
+                    "email": {
+                        "anyOf": [{
+                            "type": "string",
+                            "format": "email"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Email"
+                    },
+                    "telefone": {
+                        "anyOf": [{
+                            "type": "string",
+                            "maxLength": 15,
+                            "minLength": 10
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Telefone"
+                    },
+                    "cpf": {
+                        "anyOf": [{
+                            "type": "string",
+                            "maxLength": 11,
+                            "minLength": 11,
+                            "pattern": "^\\d{11}$"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Cpf"
+                    }
+                },
+                "type": "object",
+                "title": "ClienteUpdateSchema"
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "PagamentoAtualizaSchema": {
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "title": "Status"
+                    }
+                },
+                "type": "object",
+                "required": ["status"],
+                "title": "PagamentoAtualizaSchema"
+            },
+            "PagamentoAtualizaWebhookSchema": {
+                "properties": {
+                    "codigo_pagamento": {
+                        "type": "string",
+                        "title": "Codigo Pagamento"
+                    },
+                    "status": {
+                        "type": "string",
+                        "title": "Status"
+                    }
+                },
+                "type": "object",
+                "required": ["codigo_pagamento", "status"],
+                "title": "PagamentoAtualizaWebhookSchema"
+            },
+            "PagamentoCreateSchema": {
+                "properties": {
+                    "pedido_id": {
+                        "type": "integer",
+                        "title": "Pedido Id"
+                    }
+                },
+                "type": "object",
+                "required": ["pedido_id"],
+                "title": "PagamentoCreateSchema"
+            },
+            "PagamentoResponseSchema": {
+                "properties": {
+                    "pedido_id": {
+                        "type": "integer",
+                        "title": "Pedido Id"
+                    },
+                    "codigo_pagamento": {
+                        "type": "string",
+                        "title": "Codigo Pagamento"
+                    },
+                    "status": {
+                        "type": "string",
+                        "title": "Status"
+                    }
+                },
+                "type": "object",
+                "required": ["pedido_id", "codigo_pagamento", "status"],
+                "title": "PagamentoResponseSchema"
+            },
+            "PedidoAtualizaSchema": {
+                "properties": {
+                    "status": {
+                        "type": "integer",
+                        "title": "Status"
+                    }
+                },
+                "type": "object",
+                "required": ["status"],
+                "title": "PedidoAtualizaSchema"
+            },
+            "PedidoCreateSchema": {
+                "properties": {
+                    "cliente_id": {
+                        "anyOf": [{
+                            "type": "integer"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Cliente Id"
+                    },
+                    "produtos": {
+                        "items": {},
+                        "type": "array",
+                        "title": "Produtos"
+                    }
+                },
+                "type": "object",
+                "required": ["cliente_id", "produtos"],
+                "title": "PedidoCreateSchema"
+            },
+            "PedidoProdutosResponseSchema": {
+                "properties": {
+                    "pedido_id": {
+                        "type": "integer",
+                        "title": "Pedido Id"
+                    },
+                    "cliente_id": {
+                        "$ref": "#/components/schemas/ClienteResponseSchema"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/StatusPedidoResponseSchema"
+                    },
+                    "data_criacao": {
+                        "type": "string",
+                        "format": "time",
+                        "title": "Data Criacao"
+                    },
+                    "data_alteracao": {
+                        "anyOf": [{
+                            "type": "string",
+                            "format": "time"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Data Alteracao"
+                    },
+                    "data_finalizacao": {
+                        "anyOf": [{
+                            "type": "string",
+                            "format": "time"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Data Finalizacao"
+                    },
+                    "produtos": {
+                        "anyOf": [{
+                            "items": {
+                                "$ref": "#/components/schemas/ProdutoResponseSchema"
+                            },
+                            "type": "array"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Produtos"
+                    }
+                },
+                "type": "object",
+                "required": ["pedido_id", "cliente_id", "status", "data_criacao", "data_alteracao", "data_finalizacao", "produtos"],
+                "title": "PedidoProdutosResponseSchema"
+            },
+            "PedidoResponseSchema": {
+                "properties": {
+                    "pedido_id": {
+                        "type": "integer",
+                        "title": "Pedido Id"
+                    },
+                    "cliente_id": {
+                        "$ref": "#/components/schemas/ClienteResponseSchema"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/StatusPedidoResponseSchema"
+                    },
+                    "data_criacao": {
+                        "type": "string",
+                        "format": "time",
+                        "title": "Data Criacao"
+                    },
+                    "data_alteracao": {
+                        "anyOf": [{
+                            "type": "string",
+                            "format": "time"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Data Alteracao"
+                    },
+                    "data_finalizacao": {
+                        "anyOf": [{
+                            "type": "string",
+                            "format": "time"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Data Finalizacao"
+                    }
+                },
+                "type": "object",
+                "required": ["pedido_id", "cliente_id", "status", "data_criacao", "data_alteracao", "data_finalizacao"],
+                "title": "PedidoResponseSchema"
+            },
+            "ProdutoCreateSchema": {
+                "properties": {
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "minLength": 3,
+                        "title": "Nome"
+                    },
+                    "descricao": {
+                        "anyOf": [{
+                            "type": "string"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Descricao"
+                    },
+                    "categoria": {
+                        "type": "integer",
+                        "title": "Categoria"
+                    },
+                    "preco": {
+                        "anyOf": [{
+                            "type": "number",
+                            "exclusiveMinimum": 0.0
+                        }, {
+                            "type": "string"
+                        }],
+                        "title": "Preco",
+                        "description": "Preço deve ser maior que zero"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": ["nome", "categoria", "preco"],
+                "title": "ProdutoCreateSchema"
+            },
+            "ProdutoResponseSchema": {
+                "properties": {
+                    "produto_id": {
+                        "type": "integer",
+                        "title": "Produto Id"
+                    },
+                    "nome": {
+                        "type": "string",
+                        "title": "Nome"
+                    },
+                    "descricao": {
+                        "anyOf": [{
+                            "type": "string"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Descricao"
+                    },
+                    "preco": {
+                        "type": "string",
+                        "title": "Preco"
+                    },
+                    "categoria": {
+                        "$ref": "#/components/schemas/CategoriaProdutoResponseSchema"
+                    }
+                },
+                "type": "object",
+                "required": ["produto_id", "nome", "preco", "categoria"],
+                "title": "ProdutoResponseSchema"
+            },
+            "ProdutoUpdateSchema": {
+                "properties": {
+                    "nome": {
+                        "anyOf": [{
+                            "type": "string",
+                            "maxLength": 100,
+                            "minLength": 3
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Nome"
+                    },
+                    "descricao": {
+                        "anyOf": [{
+                            "type": "string"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Descricao"
+                    },
+                    "categoria": {
+                        "anyOf": [{
+                            "$ref": "#/components/schemas/CategoriaProdutoEnum"
+                        }, {
+                            "type": "null"
+                        }]
+                    },
+                    "preco": {
+                        "anyOf": [{
+                            "type": "number",
+                            "exclusiveMinimum": 0.0
+                        }, {
+                            "type": "string"
+                        }, {
+                            "type": "null"
+                        }],
+                        "title": "Preco",
+                        "description": "Preço deve ser maior que zero"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "title": "ProdutoUpdateSchema"
+            },
+            "StatusPedidoCreateSchema": {
+                "properties": {
+                    "descricao": {
+                        "type": "string",
+                        "title": "Descricao"
+                    }
+                },
+                "type": "object",
+                "required": ["descricao"],
+                "title": "StatusPedidoCreateSchema"
+            },
+            "StatusPedidoResponseSchema": {
+                "properties": {
+                    "descricao": {
+                        "type": "string",
+                        "title": "Descricao"
+                    },
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    }
+                },
+                "type": "object",
+                "required": ["descricao", "id"],
+                "title": "StatusPedidoResponseSchema"
+            },
+            "StatusPedidoUpdateSchema": {
+                "properties": {
+                    "descricao": {
+                        "type": "string",
+                        "title": "Descricao"
+                    }
+                },
+                "type": "object",
+                "required": ["descricao"],
+                "title": "StatusPedidoUpdateSchema"
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [{
+                                "type": "string"
+                            }, {
+                                "type": "integer"
+                            }]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    }
+                },
+                "type": "object",
+                "required": ["loc", "msg", "type"],
+                "title": "ValidationError"
+            }
+        }
+    }
+}

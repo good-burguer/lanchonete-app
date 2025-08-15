@@ -1,0 +1,135 @@
+{
+    "info": {
+        "_postman_id": "88df3956-c5b8-4f2a-95b9-22ad25768afc",
+        "name": "Produtos",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": ""
+    },
+    "item": [
+        {
+            "name": "Get all",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:8000/produtos",
+                    "path": [
+                        "produtos"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                }
+            }
+        },
+        {
+            "name": "Create",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:8000/produtos/",
+                    "path": [
+                        "produtos"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"nome\": \"Hamburguer\",\n  \"descricao\": \"Pão, carne e queijo\",\n  \"categoria\": 1,\n  \"preco\": 1.00\n}"
+                }
+            }
+        },
+        {
+            "name": "Get by id",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:8000/produtos/39",
+                    "path": [
+                        "produtos",
+                        "39"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                }
+            }
+        },
+        {
+            "name": "Delete by id",
+            "request": {
+                "method": "DELETE",
+                "url": {
+                    "raw": "http://localhost:8000/produtos/39",
+                    "path": [
+                        "produtos",
+                        "39"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                }
+            }
+        },
+        {
+            "name": "Update by id",
+            "request": {
+                "method": "PUT",
+                "url": {
+                    "raw": "http://localhost:8000/produtos/39",
+                    "path": [
+                        "produtos",
+                        "39"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"nome\": \"Hamburguer alterado\",\n  \"descricao\": \"Pão, carne e queijo\",\n  \"categoria\": \"4\",\n  \"preco\": 1.00\n}"
+                }
+            }
+        },
+        {
+            "name": "Get by category",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:8000/produtos/categoria/4",
+                    "path": [
+                        "produtos",
+                        "categoria",
+                        "4"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                }
+            }
+        }
+    ]
+}

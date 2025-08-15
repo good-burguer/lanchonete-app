@@ -1,0 +1,116 @@
+{
+    "info": {
+        "_postman_id": "0ca3db38-ab64-4b8e-b7aa-e69a02ea473d",
+        "name": "Status",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": ""
+    },
+    "item": [
+        {
+            "name": "Get all",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:8000/status_pedido",
+                    "path": [
+                        "status_pedido"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                }
+            }
+        },
+        {
+            "name": "Create",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:8000/status_pedido",
+                    "path": [
+                        "status_pedido"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"descricao\": \"Em andamento\"\n}"
+                }
+            }
+        },
+        {
+            "name": "Get by id",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:8000/status_pedido/6",
+                    "path": [
+                        "status_pedido",
+                        "6"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                }
+            }
+        },
+        {
+            "name": "Update",
+            "request": {
+                "method": "PUT",
+                "url": {
+                    "raw": "http://localhost:8000/status_pedido/6",
+                    "path": [
+                        "status_pedido",
+                        "6"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"descricao\": \"Alterado 2\"\n}"
+                }
+            }
+        },
+        {
+            "name": "Delete ",
+            "request": {
+                "method": "DELETE",
+                "url": {
+                    "raw": "http://localhost:8000/status_pedido/6",
+                    "path": [
+                        "status_pedido",
+                        "6"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                }
+            }
+        }
+    ]
+}

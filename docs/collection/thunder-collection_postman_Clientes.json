@@ -1,0 +1,116 @@
+{
+    "info": {
+        "_postman_id": "7817cfd2-34bb-4ea5-82cf-377b2a381507",
+        "name": "Clientes",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": ""
+    },
+    "item": [
+        {
+            "name": "Get all",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:8000/clientes",
+                    "path": [
+                        "clientes"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                }
+            }
+        },
+        {
+            "name": "Create",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:8000/clientes",
+                    "path": [
+                        "clientes"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"nome\": \"Teste Cliente Novo\",\n  \"cpf\": \"12345678912\",\n  \"telefone\": \"00000000000\",\n  \"email\": \"teste@teste.com.br\"\n}"
+                }
+            }
+        },
+        {
+            "name": "Update by id",
+            "request": {
+                "method": "PUT",
+                "url": {
+                    "raw": "http://localhost:8000/clientes/2",
+                    "path": [
+                        "clientes",
+                        "2"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"nome\": \"alterado 2\",\n  \"email\": \"emailusuario@teste.com\",\n  \"cpf\": \"12345678901\"\n}"
+                }
+            }
+        },
+        {
+            "name": "Get by id",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:8000/clientes/1",
+                    "path": [
+                        "clientes",
+                        "1"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                }
+            }
+        },
+        {
+            "name": "Delete by id",
+            "request": {
+                "method": "DELETE",
+                "url": {
+                    "raw": "http://localhost:8000/clientes/2",
+                    "path": [
+                        "clientes",
+                        "2"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                }
+            }
+        }
+    ]
+}
