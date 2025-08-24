@@ -1,0 +1,1 @@
+# adicione suas libs aqui (ex.: fastapi, uvicorn, psycopg2-binary, pydantic, ...)
