@@ -1,5 +1,7 @@
 from fastapi import HTTPException, Response, status
-from app.use_cases.produto.produto_use_case import ProdutoUseCase
+
+from app.use_cases.produto_use_case import ProdutoUseCase
+from app.adapters.presenters.produto_presenter import ProdutoResponse, ProdutoResponseList
 
 class ProdutoController:
     
@@ -8,27 +10,33 @@ class ProdutoController:
     
     def criar_produto(self, produto):
         try:
-            return ProdutoUseCase(self.db_session).criar_produto(produto)
+            result = ProdutoUseCase(self.db_session).criar_produto(produto)
+
+            return ProdutoResponse(status = 'sucess', data = result)
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
     def listar_todos(self):
         try:
-            return ProdutoUseCase(self.db_session).listar_todos()
+            result = ProdutoUseCase(self.db_session).listar_todos()
+            
+            return ProdutoResponseList(status = 'sucess', data = result)
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
     def listar_produtos_por_categoria(self, categoria):
         try:
-
-            return ProdutoUseCase(self.db_session).listar_por_categoria(categoria)
+            result = ProdutoUseCase(self.db_session).listar_por_categoria(categoria)
+            
+            return ProdutoResponseList(status = 'sucess', data = result)
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
     def buscar_produto(self, produto_id):
         try:
-
-            return ProdutoUseCase(self.db_session).buscar_por_id(produto_id)
+            result = ProdutoUseCase(self.db_session).buscar_por_id(produto_id)
+            
+            return ProdutoResponse(status = 'sucess', data = result)
         except ValueError as e:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
         except Exception as e:
@@ -36,8 +44,9 @@ class ProdutoController:
 
     def atualizar_produto(self, produto_id, produto):
         try:
-
-            return ProdutoUseCase(self.db_session).atualizar_produto(produto_id, produto_data=produto)
+            result = ProdutoUseCase(self.db_session).atualizar_produto(produto_id, produto_data=produto)
+            
+            return ProdutoResponse(status = 'sucess', data = result)
         except ValueError as e:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
         except Exception as e:

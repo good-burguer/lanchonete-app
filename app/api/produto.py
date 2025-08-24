@@ -1,17 +1,19 @@
 from fastapi import APIRouter, HTTPException, Depends, Response, status
 from sqlalchemy.orm import Session
 
-from app.gateways.produto_gateway import ProdutoGateway
-from app.controllers.produto_controller import ProdutoController
-from app.adapters.schemas.produto import ProdutoCreateSchema, ProdutoResponseSchema, ProdutoUpdateSchema
 from app.infrastructure.db.database import get_db
+from app.gateways.produto_gateway import ProdutoGateway
+from app.adapters.presenters.produto_presenter import ProdutoResponse
+from app.adapters.dto.produto_dto import ProdutoCreateSchema, ProdutoUpdateSchema
+from app.controllers.produto_controller import ProdutoController
 
 router = APIRouter(prefix="/produtos", tags=["produtos"])
 
-def get_produto_repository(db: Session = Depends(get_db)) -> ProdutoGateway:
-    return ProdutoGateway(db_session=db)
+def get_produto_gateway(database: Session = Depends(get_db)) -> ProdutoGateway:
+    
+    return ProdutoGateway(db_session=database)
 
-@router.post("/", response_model=ProdutoResponseSchema, status_code=status.HTTP_201_CREATED, responses={
+@router.post("/", response_model=ProdutoResponse, status_code=status.HTTP_201_CREATED, responses={
     400: {
         "description": "Erro de validação",
         "content": {
@@ -23,15 +25,16 @@ def get_produto_repository(db: Session = Depends(get_db)) -> ProdutoGateway:
         }
     }
 })
-def criar_produto(produto: ProdutoCreateSchema, repository: ProdutoGateway = Depends(get_produto_repository)):
+def criar_produto(produto_data: ProdutoCreateSchema, gateway: ProdutoGateway = Depends(get_produto_gateway)):
     try:
-        produto_criado = ProdutoController(db_session=repository).criar_produto(produto)
 
-        return ProdutoResponseSchema(**produto_criado.model_dump())
+        return (ProdutoController(db_session=gateway)
+                    .criar_produto(produto_data))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-@router.get("/", response_model=list[ProdutoResponseSchema], responses={
+#! Corrigir swagger
+@router.get("/", responses={
     400: {
         "description": "Erro de validação",
         "content": {
@@ -47,13 +50,16 @@ def criar_produto(produto: ProdutoCreateSchema, repository: ProdutoGateway = Dep
         "422": None  
     }
 })
-def listar_produtos(repository: ProdutoGateway = Depends(get_produto_repository)):
+def listar_produtos(gateway: ProdutoGateway = Depends(get_produto_gateway)):
     try:
-        return ProdutoController(repository).listar_todos()
+        
+        return (ProdutoController(db_session=gateway)
+                    .listar_todos())
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-@router.get("/categoria/{categoria}", response_model=list[ProdutoResponseSchema], responses={
+#! Corrigir swagger
+@router.get("/categoria/{categoria}", responses={
     400: {
         "description": "Erro de validação",
         "content": {
@@ -69,13 +75,15 @@ def listar_produtos(repository: ProdutoGateway = Depends(get_produto_repository)
         "422": None  
     }
 })
-def listar_produtos_por_categoria(categoria: int, repository: ProdutoGateway = Depends(get_produto_repository)):
+def listar_produtos_por_categoria(categoria: int, gateway: ProdutoGateway = Depends(get_produto_gateway)):
     try:
-        return ProdutoController(repository).listar_produtos_por_categoria(categoria)
+        
+        return (ProdutoController(db_session=gateway)
+                    .listar_produtos_por_categoria(categoria))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-@router.get("/{produto_id}", response_model=ProdutoResponseSchema, responses={
+@router.get("/{produto_id}", responses={
     400: {
         "description": "Erro de validação",
         "content": {
@@ -101,16 +109,17 @@ def listar_produtos_por_categoria(categoria: int, repository: ProdutoGateway = D
         "422": None  
     }
 })
-def buscar_produto(produto_id: int, repository: ProdutoGateway = Depends(get_produto_repository)):
+def buscar_produto(produto_id: int, gateway: ProdutoGateway = Depends(get_produto_gateway)):
     try:
-
-        return ProdutoController(repository).buscar_produto(produto_id)
+        
+        return (ProdutoController(db_session=gateway)
+                    .buscar_produto(produto_id))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-@router.put("/{produto_id}", response_model=ProdutoResponseSchema, responses={
+@router.put("/{produto_id}", response_model=ProdutoResponse, responses={
     404: {
         "description": "Erro de validação",
         "content": {
@@ -132,9 +141,11 @@ def buscar_produto(produto_id: int, repository: ProdutoGateway = Depends(get_pro
         }
     }
 })
-def atualizar_produto(produto_id: int, produto: ProdutoUpdateSchema, repository: ProdutoGateway = Depends(get_produto_repository)):
+def atualizar_produto(produto_id: int, produto: ProdutoUpdateSchema, gateway: ProdutoGateway = Depends(get_produto_gateway)):
     try:
-        return ProdutoController(repository).atualizar_produto(produto_id, produto=produto)
+        
+        return (ProdutoController(db_session=gateway)
+                    .atualizar_produto(produto_id, produto=produto))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
@@ -170,9 +181,9 @@ def atualizar_produto(produto_id: int, produto: ProdutoUpdateSchema, repository:
         }
     }
 })
-def deletar_produto(produto_id: int, repository: ProdutoGateway = Depends(get_produto_repository)):
+def deletar_produto(produto_id: int, gateway: ProdutoGateway = Depends(get_produto_gateway)):
     try:
-        ProdutoController(repository).deletar_produto(produto_id)
+        ProdutoController(db_session=gateway).deletar_produto(produto_id)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except ValueError as e:

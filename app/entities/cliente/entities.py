@@ -9,11 +9,11 @@ class ClienteEntities(ABC):
         pass
 
     @abstractmethod
-    def buscar_por_id(self, cliente_id: int) -> Optional[Cliente]:
+    def buscar_por_cpf(self, cpf_cliente: str) -> Optional[Cliente]:
         pass
 
     @abstractmethod
-    def buscar_por_cpf(self, cpf: str) -> Optional[Cliente]:
+    def buscar_por_id(self, cliente_id: int) -> Optional[Cliente]:
         pass
 
     @abstractmethod

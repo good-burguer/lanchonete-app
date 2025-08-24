@@ -1,40 +1,19 @@
 from fastapi import APIRouter, HTTPException, Depends, Response, status
 from sqlalchemy.orm import Session
 
-from app.gateways.pagamento_gateway import PagamentoGateway
-from app.controllers.pagamento_controller import PagamentoController
-from app.adapters.schemas.pagamento import *
 from app.infrastructure.db.database import get_db
+from app.gateways.pagamento_gateway import PagamentoGateway
+from app.adapters.presenters.pagamento_presenter import PagamentoResponse
+from app.adapters.dto.pagamento_dto import PagamentoCreateSchema
+from app.controllers.pagamento_controller import PagamentoController
 
 router = APIRouter(prefix="/pagamento", tags=["pagamento"])
 
 def get_pagamento_gateway(db: Session = Depends(get_db)) -> PagamentoGateway:
+    
     return PagamentoGateway(db_session=db)
 
-@router.get("/", response_model=list[PagamentoResponseSchema], summary="Listar todos os pagamentos realizado", responses={
-    400: {
-        "description": "Erro de validação",
-        "content": {
-            "application/json": {
-                "example": {
-                    "message": "Erro de integridade ao buscar os pagamentos"
-                }
-            }
-        }
-    }
-}, openapi_extra={
-    "responses": {
-        "422": None  
-    }
-})
-def listar_pagamentos(db_session: PagamentoGateway = Depends(get_pagamento_gateway)):
-    try:
-        
-        return PagamentoController(db_session=db_session).listar_todos_pagamentos()
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
-@router.post("/", response_model=PagamentoResponseSchema, status_code=status.HTTP_201_CREATED, summary="Criar pagamento do pedido", responses={
+@router.post("/", response_model=PagamentoResponse, status_code=status.HTTP_201_CREATED, summary="Criar pagamento do pedido", responses={
     400: {
         "description": "Erro de validação",
         "content": {
@@ -46,14 +25,15 @@ def listar_pagamentos(db_session: PagamentoGateway = Depends(get_pagamento_gatew
         }
     }
 })
-def efetuar_pagamento_pedido(pedido_id: PagamentoCreateSchema, db_session: PagamentoGateway = Depends(get_pagamento_gateway)):
+def efetuar_pagamento_pedido(pedido_id: PagamentoCreateSchema, gateway: PagamentoGateway = Depends(get_pagamento_gateway)):
     try:
         
-        return PagamentoController(db_session=db_session).criar_pagamento(cliente_data=pedido_id)
+        return (PagamentoController(db_session=gateway)
+                    .criar_pagamento(cliente_data=pedido_id))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-@router.get("/{codigo_pagamento}", response_model=PagamentoResponseSchema, responses={
+@router.get("/{codigo_pagamento}", response_model=PagamentoResponse, responses={
     400: {
         "description": "Erro de validação",
         "content": {
@@ -79,16 +59,41 @@ def efetuar_pagamento_pedido(pedido_id: PagamentoCreateSchema, db_session: Pagam
         "422": None  
     }
 })
-def buscar_pagamento(codigo_pagamento: str, db_session: PagamentoGateway = Depends(get_pagamento_gateway)):
+def buscar_pagamento(codigo_pagamento: str, gateway: PagamentoGateway = Depends(get_pagamento_gateway)):
     try:
         
-        return PagamentoController(db_session=db_session).buscar_pagamento_por_codigo(codigo_pagamento=codigo_pagamento)
+        return (PagamentoController(db_session=gateway)
+                    .buscar_pagamento(codigo_pagamento=codigo_pagamento))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    
+@router.get("/", summary="Listar todos os pagamentos realizado", responses={
+    400: {
+        "description": "Erro de validação",
+        "content": {
+            "application/json": {
+                "example": {
+                    "message": "Erro de integridade ao buscar os pagamentos"
+                }
+            }
+        }
+    }
+}, openapi_extra={
+    "responses": {
+        "422": None  
+    }
+})
+def listar_pagamentos(gateway: PagamentoGateway = Depends(get_pagamento_gateway)):
+    try:
+        
+        return (PagamentoController(db_session=gateway)
+                .listar_todos_pagamentos())
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-@router.put("/{codigo_pagamento}", response_model=PagamentoResponseSchema, responses={
+@router.put("/{codigo_pagamento}", response_model=PagamentoResponse, responses={
     404: {
         "description": "Erro de validação",
         "content": {
@@ -110,10 +115,10 @@ def buscar_pagamento(codigo_pagamento: str, db_session: PagamentoGateway = Depen
         }
     }
 })
-def atualizar_pagamento(codigo_pagamento: str, pagamento_data: PagamentoAtualizaSchema, db_session: PagamentoGateway = Depends(get_pagamento_gateway)):
+def atualizar_pagamento(codigo_pagamento: str, pagamento_data: PagamentoResponse, gateway: PagamentoGateway = Depends(get_pagamento_gateway)):
     try:
         
-        return PagamentoController(db_session=db_session).atualizar_pagamento(codigo=codigo_pagamento, pagamento_request=pagamento_data)
+        return PagamentoController(db_session=gateway).atualizar_pagamento(codigo=codigo_pagamento, pagamento_request=pagamento_data)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
@@ -149,11 +154,10 @@ def atualizar_pagamento(codigo_pagamento: str, pagamento_data: PagamentoAtualiza
         }
     }
 })
-def deletar_pagamento(codigo_pagamento: str, db_session: PagamentoGateway = Depends(get_pagamento_gateway)):
+def deletar_pagamento(codigo_pagamento: str, gateway: PagamentoGateway = Depends(get_pagamento_gateway)):
     try:
-        PagamentoController(db_session=db_session).deletar_pagamento(codigo_pagamento=codigo_pagamento)
-        
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
+        return (PagamentoController(db_session=gateway)
+                    .deletar_pagamento(codigo_pagamento=codigo_pagamento))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:

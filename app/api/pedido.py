@@ -3,23 +3,28 @@ from sqlalchemy.orm import Session
 
 from app.infrastructure.db.database import get_db
 from app.gateways.pedido_gateway import PedidoGateway
-from app.gateways.pedido_produto_gateway import PedidoProdutoGateway
 from app.gateways.produto_gateway import ProdutoGateway
+from app.gateways.pedido_produto_gateway import PedidoProdutoGateway
 from app.controllers.pedido_controller import PedidoController
-from app.adapters.schemas.pedido import PedidoCreateSchema, PedidoResponseSchema, PedidoAtualizaSchema, PedidoProdutosResponseSchema
+
+from app.adapters.presenters.pedido_presenter import PedidoResponse
+from app.adapters.dto.pedido_dto import PedidoCreateSchema, PedidoAtualizaSchema
 
 router = APIRouter(prefix="/pedidos", tags=["pedidos"])
 
 def get_pedido_gateway(db: Session = Depends(get_db)) -> PedidoGateway:
+    
     return PedidoGateway(db_session=db)
 
 def get_pedido_produto_gateway(db: Session = Depends(get_db)) -> PedidoProdutoGateway:
+    
     return PedidoProdutoGateway(db_session=db)
 
 def get_produto_gateway(db: Session = Depends(get_db)) -> ProdutoGateway:
+    
     return ProdutoGateway(db_session=db)
 
-@router.post("/", response_model=PedidoProdutosResponseSchema, status_code=status.HTTP_201_CREATED, responses={
+@router.post("/", status_code=status.HTTP_201_CREATED, responses={
     400: {
         "description": "Erro de validação",
         "content": {
@@ -33,17 +38,20 @@ def get_produto_gateway(db: Session = Depends(get_db)) -> ProdutoGateway:
 })
 def criar_pedido(
         pedido: PedidoCreateSchema, 
-        pedidoGateway: PedidoGateway = Depends(get_pedido_gateway), 
+        gateway: PedidoGateway = Depends(get_pedido_gateway), 
         pedidoProdutosGateway: PedidoProdutoGateway = Depends(get_pedido_produto_gateway), 
         produtoGateway: ProdutoGateway = Depends(get_produto_gateway)
     ):
-    
     try:
-        return PedidoController(pedidoGateway).criarPedido(pedido=pedido, pedidoProdutosGateway=pedidoProdutosGateway, produtoGateway=produtoGateway)
+
+        return (PedidoController(db_session=gateway)
+                    .criar_pedido(pedido=pedido, 
+                                 pedidoProdutosGateway=pedidoProdutosGateway, 
+                                 produtoGateway=produtoGateway))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-@router.get("/", response_model=list[PedidoResponseSchema], responses={
+@router.get("/", responses={
     400: {
         "description": "Erro de validação",
         "content": {
@@ -60,13 +68,15 @@ openapi_extra={
         "422": None  
     }
 })
-def listar_pedidos(repository: PedidoGateway = Depends(get_pedido_gateway)):
+def listar_pedidos(gateway: PedidoGateway = Depends(get_pedido_gateway)):
     try:
-        return PedidoController(repository).listar_todos()
+        
+        return (PedidoController(db_session=gateway)
+                    .listar_todos())
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-@router.get("/{pedido_id}", response_model=PedidoProdutosResponseSchema, responses={
+@router.get("/{pedido_id}", responses={
     404: {
         "description": "Erro de validação",
         "content": {
@@ -99,13 +109,17 @@ def buscar_pedido(
         produtoGateway: ProdutoGateway = Depends(get_produto_gateway)
     ):
     try:
-        return PedidoController(db_session=gateway).buscar_por_id(pedido_id=pedido_id, pedidoProdutosRepository=pedidoProdutosGateway, produtoRepository=produtoGateway)
+        
+        return (PedidoController(db_session=gateway)
+                    .buscar_por_id(pedido_id=pedido_id, 
+                                   pedidoProdutosGateway=pedidoProdutosGateway, 
+                                   produtoRepository=produtoGateway))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-@router.put("/{pedido_id}", response_model=PedidoResponseSchema, responses={
+@router.put("/{pedido_id}", response_model=PedidoResponse, responses={
     404: {
         "description": "Erro de validação",
         "content": {
@@ -127,10 +141,15 @@ def buscar_pedido(
         }
     }
 })
-def atualizar_pedido(pedido_id: int, pedido: PedidoAtualizaSchema, gateway: PedidoGateway = Depends(get_pedido_gateway)):
+def atualizar_pedido(pedido_id: int, pedido: PedidoAtualizaSchema, gateway: PedidoGateway = Depends(get_pedido_gateway), pedidoProdutosGateway: PedidoProdutoGateway = Depends(get_pedido_produto_gateway),
+        produtoGateway: ProdutoGateway = Depends(get_produto_gateway)):
     try:
 
-        return PedidoController(db_session=gateway).atualiza(pedido_id=pedido_id, pedidoRequest=pedido)
+        return (PedidoController(db_session=gateway)
+                    .atualizar_pedido(pedido_id=pedido_id, 
+                                pedidoRequest=pedido,
+                                pedidoProdutosGateway=pedidoProdutosGateway, 
+                                produtoRepository=produtoGateway))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
@@ -168,7 +187,10 @@ def atualizar_pedido(pedido_id: int, pedido: PedidoAtualizaSchema, gateway: Pedi
 })
 def deletar_pedido(pedido_id: int, gateway: PedidoGateway = Depends(get_pedido_gateway), repositoryProductOrder: PedidoProdutoGateway = Depends(get_pedido_produto_gateway)):
     try:
-        return PedidoController(db_session=gateway).deletar(pedido_id=pedido_id, repositoryProductOrder=repositoryProductOrder)
+        
+        return (PedidoController(db_session=gateway)
+                    .deletar(pedido_id=pedido_id, 
+                             repositoryProductOrder=repositoryProductOrder))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:

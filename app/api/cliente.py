@@ -1,20 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.gateways.cliente_gateway import ClienteGateway
 from app.infrastructure.db.database import get_db
-from app.adapters.schemas.cliente import ClienteCreateSchema, ClienteResponseSchema, ClienteUpdateSchema
+from app.gateways.cliente_gateway import ClienteGateway
+from app.adapters.presenters.cliente_presenter import ClienteResponse
+from app.adapters.dto.cliente_dto import ClienteCreateSchema, ClienteUpdateSchema
 from app.controllers.cliente_controller import ClienteController
 
 router = APIRouter(prefix="/clientes", tags=["clientes"])
 
-# Dependência para injetar o service
-def get_cliente_gateway(db: Session = Depends(get_db)) -> ClienteGateway:
+def get_cliente_gateway(database: Session = Depends(get_db)) -> ClienteGateway:
     
-    return ClienteGateway(db_session=db)
+    return ClienteGateway(db_session=database)
 
-@router.post("/", response_model=ClienteResponseSchema, status_code=status.HTTP_201_CREATED, responses={
+@router.post("/", response_model=ClienteResponse, status_code=status.HTTP_201_CREATED, responses={
     400: {
         "description": "Erro de validação",
         "content": {
@@ -28,11 +28,13 @@ def get_cliente_gateway(db: Session = Depends(get_db)) -> ClienteGateway:
 })
 def criar_cliente(cliente_data: ClienteCreateSchema, gateway: ClienteGateway = Depends(get_cliente_gateway)):
     try:
-        return ClienteController.criar_cliente(cliente_data, gateway)
+        
+        return (ClienteController(db_session=gateway)
+                    .criar_cliente(cliente_data))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-@router.get("/cpf/{cpf}", response_model=ClienteResponseSchema, responses={
+@router.get("/cpf/{cpf}", response_model=ClienteResponse, responses={
     404: {
         "description": "Erro de validação",
         "content": {
@@ -61,13 +63,14 @@ def criar_cliente(cliente_data: ClienteCreateSchema, gateway: ClienteGateway = D
 def buscar_cliente_por_cpf(cpf: str, gateway: ClienteGateway = Depends(get_cliente_gateway)):
     try:
 
-        return ClienteController.buscar_cliente_por_cpf(cpf, gateway)
+        return (ClienteController(db_session=gateway)
+                    .buscar_cliente_por_cpf(cpf))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-@router.get("/{cliente_id}", response_model=ClienteResponseSchema, responses={
+@router.get("/{cliente_id}", response_model=ClienteResponse, responses={
     404: {
         "description": "Erro de validação",
         "content": {
@@ -96,13 +99,15 @@ def buscar_cliente_por_cpf(cpf: str, gateway: ClienteGateway = Depends(get_clien
 def buscar_cliente(cliente_id: int, gateway: ClienteGateway = Depends(get_cliente_gateway)):
     try:
 
-        return ClienteController.buscar_cliente(cliente_id, gateway)
+        return (ClienteController(db_session=gateway)
+                    .buscar_cliente(cliente_id))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-@router.get("/", response_model=List[ClienteResponseSchema], responses={
+#! Corrigir swagger
+@router.get("/", responses={
     400: {
         "description": "Erro de validação",
         "content": {
@@ -122,11 +127,11 @@ openapi_extra={
 def listar_clientes(gateway: ClienteGateway = Depends(get_cliente_gateway)):
     try:
 
-        return ClienteController.listar_clientes(gateway)
+        return ClienteController(db_session=gateway).listar_clientes()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-@router.put("/{cliente_id}", response_model=ClienteResponseSchema, responses={
+@router.put("/{cliente_id}", response_model=ClienteResponse, responses={
     404: {
         "description": "Erro de validação",
         "content": {
@@ -150,7 +155,9 @@ def listar_clientes(gateway: ClienteGateway = Depends(get_cliente_gateway)):
 })
 def atualizar_cliente(cliente_id: int, cliente_data: ClienteUpdateSchema, gateway: ClienteGateway = Depends(get_cliente_gateway)):
     try:
-        return ClienteController.atualizar_cliente(cliente_id=cliente_id, cliente_data=cliente_data, gateway=gateway)
+
+        return (ClienteController(db_session=gateway)
+                    .atualizar_cliente(cliente_id=cliente_id, cliente_data=cliente_data))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
@@ -188,9 +195,8 @@ def atualizar_cliente(cliente_id: int, cliente_data: ClienteUpdateSchema, gatewa
 })
 def deletar_cliente(cliente_id: int, gateway: ClienteGateway = Depends(get_cliente_gateway)):
     try:
-        ClienteController.deletar_cliente(cliente_id=cliente_id, gateway=gateway)
-
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
+        
+        return ClienteController(db_session=gateway).deletar_cliente(cliente_id=cliente_id)       
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:

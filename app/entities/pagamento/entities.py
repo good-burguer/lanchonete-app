@@ -6,10 +6,10 @@ class PagamentoEntities(ABC):
     def criar_pagamento(self, pedido_pagamento: Pagamento): pass
 
     @abstractmethod
-    def listar_todos_pagamentos(self): pass
+    def buscar_pagamento(self, codigo_pagamento: str): pass
 
     @abstractmethod
-    def buscar_pagamento_por_codigo(self, codigo_pagamento: str): pass
+    def listar_todos_pagamentos(self): pass
 
     @abstractmethod
     def atualizar_pagamento(self, codigo: str, pagamento: Pagamento): pass

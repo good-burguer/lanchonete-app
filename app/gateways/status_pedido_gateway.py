@@ -1,65 +1,31 @@
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from app.entities.status_pedido.entities import StatusPedidoEntities
 from app.entities.status_pedido.models import StatusPedido
-from app.models.status_pedido import StatusPedido as StatusPedidoORM
-from app.adapters.schemas.status_pedido import StatusPedidoResponseSchema
+from app.dao.status_pedido_dao import StatusPedidoDAO
 
-class StatusPedidoRepository(StatusPedidoEntities):
+class StatusPedidoGateway(StatusPedidoEntities):
+    
     def __init__(self, db_session: Session):
-        self.db_session = db_session
+        self.dao = StatusPedidoDAO(db_session)
 
     def criar(self, status: StatusPedido):
-        try:
-            db_status = StatusPedidoORM(
-                descricao=status.descricao
-            )
-            self.db_session.add(db_status)
-            self.db_session.commit()
-        except IntegrityError as e:
-            self.db_session.rollback()
-            
-            raise Exception(f"Erro de integridade ao criar o status: {e}")
         
-        self.db_session.refresh(db_status)
-        response = StatusPedidoResponseSchema.model_validate(db_status, from_attributes=True)
-        
-        return response
+        return self.dao.criar(status)
 
     def buscar_por_id(self, id: int) -> Optional[StatusPedido]:
-        orm = self.db_session.query(StatusPedidoORM).filter_by(id=id).first()
         
-        if not orm:
-            raise ValueError("Status não encontrado")
-        
-        return orm
+        return self.dao.buscar_por_id(id)
 
     def listar_todos(self) -> List[StatusPedido]:
-        orm = self.db_session.query(StatusPedidoORM).all()
-
-        return orm
-    
-    def atualizar(self, status: StatusPedido) -> StatusPedido:
-        orm = self.db_session.query(StatusPedidoORM).filter_by(id=status.id).first()
-
-        if not orm:
-            raise ValueError("Status não encontrado")
         
-        for field, value in status.model_dump().items():
-            setattr(orm, field, value)
-
-        self.db_session.commit()
-        self.db_session.refresh(orm)
-
-        return orm
+        return self.dao.listar_todos()
+    
+    def atualizar(self, id: int, status: StatusPedido) -> StatusPedido:
+        
+        return self.dao.atualizar(id, status)
 
     def deletar(self, id: int) -> None:
-        orm = self.db_session.query(StatusPedidoORM).filter_by(id=id).first()
-
-        if not orm:
-            raise ValueError("Status não encontrado")
         
-        self.db_session.delete(orm)
-        self.db_session.commit()
+        return self.dao.deletar(id)

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from .models import Produto
-from app.adapters.schemas.produto import ProdutoResponseSchema as ProdutoResponse
+from app.adapters.presenters.produto_presenter import ProdutoResponse
 
 class ProdutoEntities(ABC):
     @abstractmethod
