@@ -3,8 +3,8 @@ FROM python:3.12-slim-bookworm
 # Diretório de trabalho dentro do container
 WORKDIR /app
 
-# Copia os arquivos de requirements
-COPY ./config/requirements.txt .
+# Copia o arquivo de requirements
+COPY .docker/bin/config/requirements.txt .
 
 # Instala as dependências do projeto
 RUN pip install --upgrade pip \

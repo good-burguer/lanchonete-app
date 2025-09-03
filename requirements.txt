@@ -1,1 +1,12 @@
-# adicione suas libs aqui (ex.: fastapi, uvicorn, psycopg2-binary, pydantic, ...)
+fastapi
+uvicorn[standard]
+pydantic[email]>=2,<3
+sqlalchemy
+alembic
+psycopg2-binary
+boto3
+python-dotenv
+httpx
+pytest
+pytest-bdd
+bleach>=6.1
