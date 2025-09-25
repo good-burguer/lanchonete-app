@@ -4,6 +4,7 @@ import os
 import json
 import boto3
 from functools import lru_cache
+from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode, quote_plus
 
 # Prefer DATABASE_URL if provided (e.g., for local dev/overrides)
 DEFAULT_DB_URL = os.getenv("DATABASE_URL")
@@ -26,6 +27,18 @@ def _read_secret():
         # Fallback handled by caller; avoid crashing app startup
         return None
 
+def _add_sslmode(url: str) -> str:
+    """Ensure sslmode=require is present and well-formed in the DB URL."""
+    if not url:
+        return url
+    u = urlparse(url)
+    # Build/normalize query dict
+    qs = dict(parse_qsl(u.query, keep_blank_values=True))
+    if "sslmode" not in qs:
+        qs["sslmode"] = "require"
+    new_query = urlencode(qs)
+    return urlunparse((u.scheme, u.netloc, u.path, u.params, new_query, u.fragment))
+
 def _build_db_url():
     # 1) If DATABASE_URL is set, respect it (useful for local dev/tests)
     if DEFAULT_DB_URL:
@@ -34,17 +47,24 @@ def _build_db_url():
     # 2) Try Secrets Manager (IRSA in EKS)
     s = _read_secret()
     if s:
-        user = s["username"]
-        pw = s["password"]
+        user = quote_plus(s["username"])
+        pw = quote_plus(s["password"])
         host = s["host"]
         db = s.get("dbname", "postgres")
         port = s.get("port", 5432)
-        return f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
+        raw = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
+        # If this is an RDS endpoint, force sslmode=require into the URL itself
+        if "rds.amazonaws.com" in host:
+            return _add_sslmode(raw)
+        return raw
 
     # 3) Last resort: docker-compose local default
     return "postgresql+psycopg2://postgres:postgres@db:5432/lanchonete"
 
 DATABASE_URL = _build_db_url()
+
+if "rds.amazonaws.com" in DATABASE_URL:
+    DATABASE_URL = _add_sslmode(DATABASE_URL)
 
 # Add sane defaults for connection pooling; require SSL when talking to RDS
 connect_args = {"sslmode": "require"} if "rds.amazonaws.com" in DATABASE_URL else {}

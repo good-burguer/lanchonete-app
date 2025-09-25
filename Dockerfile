@@ -1,4 +1,5 @@
-FROM python:3.12-slim-bookworm
+# FROM python:3.12-slim-bookworm
+FROM public.ecr.aws/docker/library/python:3.12-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
@@ -12,8 +13,10 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 # 2) Copia o código
 COPY app ./app
-# (se usar alembic/migrations, copie também)
+# (Alembic: copiar config + scripts de migração)
 COPY alembic.ini .
+COPY alembic ./alembic
+# (opcional) scripts SQL legados, se existirem
 COPY migrations ./migrations
 
 EXPOSE 8080
