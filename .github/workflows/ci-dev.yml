@@ -76,9 +76,18 @@ jobs:
           sudo chmod +x /usr/local/bin/yq
           yq --version
 
+      - name: Get GitHub App token (read lanchonete-infra)
+        id: app_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.CI_APP_ID }}
+          private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
+          owner: good-burguer
+
       - name: Checkout infra repo (db-migrate.yaml)
         uses: actions/checkout@v4
         with:
+          token: ${{ steps.app_token.outputs.token }}
           repository: good-burguer/lanchonete-infra
           ref: main
           path: infra
