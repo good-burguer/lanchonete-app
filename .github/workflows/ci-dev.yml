@@ -69,3 +69,26 @@ jobs:
       - name: Show deployed image
         run: |
           kubectl -n "$K8S_NAMESPACE" get deploy lanchonete-app -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
+
+      - name: Install yq (YAML CLI)
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+          yq --version
+
+      - name: DB Migrate - fetch manifest from infra repo and set image
+        run: |
+          # Baixa o manifest do Job de migração do repositório de infra
+          curl -sSL -o db-migrate.yaml https://raw.githubusercontent.com/good-burguer/lanchonete-infra/main/k8s/jobs/db-migrate.yaml
+          # Substitui a imagem do container pelo IMAGE_URI recém buildado
+          yq -i '.spec.template.spec.containers[0].image = strenv(IMAGE_URI)' db-migrate.yaml
+          echo "---- db-migrate.yaml (renderizado) ----"
+          cat db-migrate.yaml
+
+      - name: DB Migrate - apply job and wait completion
+        run: |
+          set -e
+          kubectl -n "$K8S_NAMESPACE" delete job db-migrate --ignore-not-found=true
+          kubectl -n "$K8S_NAMESPACE" apply -f db-migrate.yaml
+          kubectl -n "$K8S_NAMESPACE" wait --for=condition=complete --timeout=300s job/db-migrate
+          kubectl -n "$K8S_NAMESPACE" logs job/db-migrate --tail=200
