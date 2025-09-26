@@ -79,9 +79,11 @@ jobs:
       - name: DB Migrate - fetch & render manifest (safe)
         run: |
           set -euo pipefail
-          # baixa o YAML e falha se 404/redirect
+          # baixa o YAML do repo privado via API com token do GitHub
           curl -fsSL \
-            https://raw.githubusercontent.com/good-burguer/lanchonete-infra/main/k8s/jobs/db-migrate.yaml \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.raw" \
+            "https://api.github.com/repos/good-burguer/lanchonete-infra/contents/k8s/jobs/db-migrate.yaml?ref=main" \
             -o db-migrate.yaml
 
           echo "---- HEAD db-migrate.yaml ----"
