@@ -76,18 +76,35 @@ jobs:
           sudo chmod +x /usr/local/bin/yq
           yq --version
 
-      - name: DB Migrate - fetch manifest from infra repo and set image
+      - name: DB Migrate - fetch & render manifest (safe)
         run: |
-          # Baixa o manifest do Job de migração do repositório de infra
-          curl -sSL -o db-migrate.yaml https://raw.githubusercontent.com/good-burguer/lanchonete-infra/main/k8s/jobs/db-migrate.yaml
-          # Substitui a imagem do container pelo IMAGE_URI recém buildado
-          yq -i '.spec.template.spec.containers[0].image = strenv(IMAGE_URI)' db-migrate.yaml
+          set -euo pipefail
+          # baixa o YAML e falha se 404/redirect
+          curl -fsSL \
+            https://raw.githubusercontent.com/good-burguer/lanchonete-infra/main/k8s/jobs/db-migrate.yaml \
+            -o db-migrate.yaml
+
+          echo "---- HEAD db-migrate.yaml ----"
+          sed -n '1,60p' db-migrate.yaml
+
+          # valida se é mesmo um Job; evita aplicar HTML/erro
+          if ! yq '.kind' db-migrate.yaml | grep -q '^Job$'; then
+            echo "ERRO: db-migrate.yaml não parece um Job válido (kind != Job)"
+            exit 1
+          fi
+
+          # altera a imagem apenas no documento do Job certo
+          yq -i '
+            select(.kind == "Job" and .metadata.name == "db-migrate")
+            | .spec.template.spec.containers[0].image = strenv(IMAGE_URI)
+          ' db-migrate.yaml
+
           echo "---- db-migrate.yaml (renderizado) ----"
           cat db-migrate.yaml
 
-      - name: DB Migrate - apply job and wait completion
+      - name: DB Migrate - apply and wait
         run: |
-          set -e
+          set -euo pipefail
           kubectl -n "$K8S_NAMESPACE" delete job db-migrate --ignore-not-found=true
           kubectl -n "$K8S_NAMESPACE" apply -f db-migrate.yaml
           kubectl -n "$K8S_NAMESPACE" wait --for=condition=complete --timeout=300s job/db-migrate
