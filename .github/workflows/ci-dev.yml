@@ -77,6 +77,8 @@ jobs:
           yq --version
 
       - name: DB Migrate - fetch & render manifest (safe)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           # baixa o YAML do repo privado via API com token do GitHub
