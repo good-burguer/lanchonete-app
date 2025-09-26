@@ -76,24 +76,27 @@ jobs:
           sudo chmod +x /usr/local/bin/yq
           yq --version
 
-      - name: DB Migrate - fetch & render manifest (safe)
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+      - name: Checkout infra repo (db-migrate.yaml)
+        uses: actions/checkout@v4
+        with:
+          repository: good-burguer/lanchonete-infra
+          ref: main
+          path: infra
+          sparse-checkout: |
+            k8s/jobs/db-migrate.yaml
+          sparse-checkout-cone-mode: false
+
+      - name: DB Migrate - render manifest (set image)
         run: |
           set -euo pipefail
-          # baixa o YAML do repo privado via API com token do GitHub
-          curl -fsSL \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github.raw" \
-            "https://api.github.com/repos/good-burguer/lanchonete-infra/contents/k8s/jobs/db-migrate.yaml?ref=main" \
-            -o db-migrate.yaml
+          FILE="infra/k8s/jobs/db-migrate.yaml"
 
-          echo "---- HEAD db-migrate.yaml ----"
-          sed -n '1,60p' db-migrate.yaml
+          echo "---- HEAD $FILE ----"
+          sed -n '1,120p' "$FILE"
 
           # valida se é mesmo um Job; evita aplicar HTML/erro
-          if ! yq '.kind' db-migrate.yaml | grep -q '^Job$'; then
-            echo "ERRO: db-migrate.yaml não parece um Job válido (kind != Job)"
+          if ! yq '.kind' "$FILE" | grep -q '^Job$'; then
+            echo "ERRO: $FILE não parece um Job válido (kind != Job)"
             exit 1
           fi
 
@@ -101,15 +104,17 @@ jobs:
           yq -i '
             select(.kind == "Job" and .metadata.name == "db-migrate")
             | .spec.template.spec.containers[0].image = strenv(IMAGE_URI)
-          ' db-migrate.yaml
+          ' "$FILE"
 
-          echo "---- db-migrate.yaml (renderizado) ----"
-          cat db-migrate.yaml
+          echo "---- $FILE (renderizado) ----"
+          cat "$FILE"
 
       - name: DB Migrate - apply and wait
         run: |
           set -euo pipefail
+          FILE="infra/k8s/jobs/db-migrate.yaml"
+
           kubectl -n "$K8S_NAMESPACE" delete job db-migrate --ignore-not-found=true
-          kubectl -n "$K8S_NAMESPACE" apply -f db-migrate.yaml
+          kubectl -n "$K8S_NAMESPACE" apply -f "$FILE"
           kubectl -n "$K8S_NAMESPACE" wait --for=condition=complete --timeout=300s job/db-migrate
           kubectl -n "$K8S_NAMESPACE" logs job/db-migrate --tail=200
