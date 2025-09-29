@@ -125,5 +125,15 @@ jobs:
 
           kubectl -n "$K8S_NAMESPACE" delete job db-migrate --ignore-not-found=true
           kubectl -n "$K8S_NAMESPACE" apply -f "$FILE"
-          kubectl -n "$K8S_NAMESPACE" wait --for=condition=complete --timeout=300s job/db-migrate
+
+          echo "Aguardando job db-migrate completar..."
+          if ! kubectl -n "$K8S_NAMESPACE" wait --for=condition=complete --timeout=300s job/db-migrate; then
+            echo "Job db-migrate falhou ou expirou. Exibindo logs e eventos:"
+            kubectl -n "$K8S_NAMESPACE" describe job/db-migrate
+            kubectl -n "$K8S_NAMESPACE" logs job/db-migrate --tail=200 || true
+            kubectl -n "$K8S_NAMESPACE" get events --sort-by=.metadata.creationTimestamp -n "$K8S_NAMESPACE" | tail -n 20
+            exit 1
+          fi
+
+          echo "Logs do job db-migrate:"
           kubectl -n "$K8S_NAMESPACE" logs job/db-migrate --tail=200
