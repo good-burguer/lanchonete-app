@@ -103,29 +103,3 @@ def downgrade():
     op.drop_table('pedido')
     op.drop_table('status_pedido')
     op.drop_table('cliente')
-"""v3 (no-op after base tables)
-
-Revision ID: 7a2d7ea02841
-Revises: 8b5c4d1a2f3e
-Create Date: 2025-09-26 20:16:53.404107
-
-"""
-from typing import Sequence, Union
-
-# Alembic revision identifiers
-revision: str = "7a2d7ea02841"
-down_revision: Union[str, None] = "8b5c4d1a2f3e"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
-
-
-def upgrade() -> None:
-    """No-op: base objects were created in 3f13625e81b2 and idempotent checks in 8b5c4d1a2f3e.
-    This revision intentionally performs no DDL.
-    """
-    pass
-
-
-def downgrade() -> None:
-    """No-op: nothing to undo in this revision."""
-    pass
