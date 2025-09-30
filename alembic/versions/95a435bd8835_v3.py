@@ -1,6 +1,6 @@
 """v3
 
-Revision ID: 7a2d7ea02841
+Revision ID: 95a435bd8835
 Revises: 
 Create Date: 2025-09-26 20:16:53.404107
 
@@ -11,7 +11,7 @@ from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision: str = '7a2d7ea02841'
+revision: str = '95a435bd8835'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
