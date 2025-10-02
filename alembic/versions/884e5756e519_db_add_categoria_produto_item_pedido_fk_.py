@@ -29,7 +29,37 @@ def upgrade():
     ON CONFLICT (nome) DO NOTHING;
     """)
     
-    # 2) FK produto.categoria -> categoria_produto.id (se ainda não existir)
+    # 2) Backfill de dados e FK produto.categoria -> categoria_produto.id (robusto)
+    # 2.1) garantir que existe ao menos uma categoria "Lanches" e obter seu id
+    op.execute("""
+    WITH ins AS (
+      INSERT INTO categoria_produto (nome)
+      VALUES ('Lanches')
+      ON CONFLICT (nome) DO UPDATE SET nome = EXCLUDED.nome
+      RETURNING id
+    )
+    SELECT 1;
+    """)
+  
+    # 2.2) normalizar valores inválidos de produto.categoria (NULL, 0, inexistente) para a categoria "Lanches"
+    op.execute("""
+    WITH cat AS (
+      SELECT id FROM categoria_produto WHERE nome = 'Lanches' LIMIT 1
+    )
+    UPDATE produto p
+    SET categoria = (SELECT id FROM cat)
+    WHERE
+      categoria IS NULL
+      OR categoria = 0
+      OR NOT EXISTS (
+        SELECT 1 FROM categoria_produto c WHERE c.id = p.categoria
+      );
+    """)
+  
+    # 2.3) criar a FK de forma segura:
+    #  - se ainda não existir
+    #  - adicionar como NOT VALID para não bloquear por dados legados entre o passo 2.2 e este
+    #  - validar em seguida
     op.execute("""
     DO $$
     BEGIN
@@ -41,7 +71,9 @@ def upgrade():
         ALTER TABLE produto
           ADD CONSTRAINT produto_categoria_fkey
           FOREIGN KEY (categoria)
-          REFERENCES categoria_produto(id);
+          REFERENCES categoria_produto(id)
+          NOT VALID;
+        ALTER TABLE produto VALIDATE CONSTRAINT produto_categoria_fkey;
       END IF;
     END$$;
     """)
