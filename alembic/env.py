@@ -1,130 +1,109 @@
-from logging.config import fileConfig
-from alembic import context
-from sqlalchemy import engine_from_config, pool
 import os
-import sys
 import re
+import sqlalchemy as sa
+from alembic import context
 
-# Ensure the app package is importable
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+# 👇 Tenta importar o metadata da app; se não der, usa None
+try:
+    # ajuste conforme onde está seu declarative Base
+    # exemplos comuns:
+    # from app.db import Base
+    # from app.models import Base
+    from app.db import Base  # <-- ajuste se necessário
+    target_metadata = Base.metadata
+except Exception:
+    target_metadata = None  # ainda funciona; apenas não faz autogenerate
 
-# Import Base and models so Alembic "sees" all tables via metadata
-from app.infrastructure.db.database import Base, _build_db_url  # <- Base do seu projeto, usando _build_db_url()
-from app.models import *  # noqa: F401,F403  (garante que modelos sejam carregados)
-
-# Alembic Config: acesso ao arquivo .ini
 config = context.config
 
-# Logging do Alembic (se definido no .ini)
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
-
-# Metadados usados para autogenerate
-target_metadata = Base.metadata
-
-
 def _with_sslmode(url: str) -> str:
-    """
-    Normaliza a URL para garantir `sslmode=require` de forma correta.
-    Casos tratados:
-      - Já tem ?sslmode=... (ok) → mantém
-      - Já tem &sslmode=... após '?' (ok) → mantém
-      - Malformado no PATH (ex.: .../db&sslmode=require ou .../db?sslmode=require sem query válida) → move para a query corretamente
-      - Não tem sslmode → adiciona à query (? ou & conforme existir)
-    """
-    if not url:
+    # acrescenta sslmode=require se não houver "sslmode=" na querystring
+    if "sslmode=" in url:
         return url
-    from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
+    sep = "&" if "?" in url else "?"
+    return f"{url}{sep}sslmode=require"
 
-    u = urlparse(url, allow_fragments=False)
-    path = u.path
-    query = u.query or ""
-
-    # Caso malformado: sslmode foi pendurado no PATH (sem '?')
-    # Exemplos: "/goodburger&sslmode=require" ou "/goodburger?sslmode=require" (mas query não foi parseada)
-    if ("&sslmode=" in path or "?sslmode=" in path) and not query:
-        # remove qualquer sufixo pendurado no path e inicia query com sslmode=require
-        base_path = path.split("&sslmode=")[0].split("?sslmode=")[0]
-        path = base_path
-        query = "sslmode=require"
-
-    # Parse da query atual (se houver) e normalização
-    qs = dict(parse_qsl(query, keep_blank_values=True))
-    if "sslmode" not in qs:
-        qs["sslmode"] = "require"
-
-    new_query = urlencode(qs)
-    return urlunparse((u.scheme, u.netloc, path, u.params, new_query, u.fragment))
-
+def _build_db_url() -> str:
+    """
+    Tenta importar um helper do projeto; se não existir, retorna string vazia.
+    """
+    try:
+        # ajuste este import se você já tiver um helper no projeto
+        from app.settings import build_db_url as _b
+        return _b()
+    except Exception:
+        return ""
 
 def _get_db_url() -> str:
     """
-    Resolve a URL do banco priorizando a variável de ambiente DATABASE_URL.
-    Se não existir, tenta usar build_url() do projeto.
-    Se ainda não existir, usa o valor do alembic.ini (sqlalchemy.url).
+    Resolve a URL do banco na seguinte ordem de prioridade:
+      1) ALEMBIC_DATABASE_URL (útil para CI/CD e execuções direcionadas)
+      2) DATABASE_URL (padrão comum em PaaS)
+      3) _build_db_url() do projeto
+      4) sqlalchemy.url definido no alembic.ini
+    Sempre normaliza para conter `sslmode=require` salvo se já houver `sslmode=` na query.
     """
-    env_url = os.getenv("DATABASE_URL", "").strip()
-    if env_url:
+    def _mask(u: str) -> str:
         try:
-            safe = re.sub(r'://([^:/@]+):([^@]+)@', r'://\1:***@', env_url)
-            print(f"[alembic] Using DB URL source=env: {safe}")
+            return re.sub(r"://([^:/@]+):([^@]+)@", r"://\1:***@", u)
         except Exception:
-            pass
-        return _with_sslmode(env_url)
+            return u
 
+    # 1) ALEMBIC_DATABASE_URL
+    env_alembic = os.getenv("ALEMBIC_DATABASE_URL", "").strip()
+    if env_alembic:
+        print(f"[alembic] Using DB URL source=env(ALEMBIC_DATABASE_URL): {_mask(env_alembic)}")
+        return _with_sslmode(env_alembic)
+
+    # 2) DATABASE_URL
+    env_database = os.getenv("DATABASE_URL", "").strip()
+    if env_database:
+        print(f"[alembic] Using DB URL source=env(DATABASE_URL): {_mask(env_database)}")
+        return _with_sslmode(env_database)
+
+    # 3) _build_db_url() do projeto
     try:
         built_url = _build_db_url()
         if built_url:
-            try:
-                safe = re.sub(r'://([^:/@]+):([^@]+)@', r'://\1:***@', built_url)
-                print(f"[alembic] Using DB URL source=build_url: {safe}")
-            except Exception:
-                pass
+            print(f"[alembic] Using DB URL source=build_url: {_mask(built_url)}")
             return _with_sslmode(built_url)
-    except Exception:
-        pass
+    except Exception as e:
+        # Mantém silêncio para não poluir saída, mas deixa um hint mínimo
+        print(f"[alembic] _build_db_url() falhou: {type(e).__name__}")
 
+    # 4) sqlalchemy.url do alembic.ini
     ini_url = config.get_main_option("sqlalchemy.url")
     if ini_url:
-        try:
-            safe = re.sub(r'://([^:/@]+):([^@]+)@', r'://\1:***@', ini_url)
-            print(f"[alembic] Using DB URL source=ini: {safe}")
-        except Exception:
-            pass
+        print(f"[alembic] Using DB URL source=ini: {_mask(ini_url)}")
         return _with_sslmode(ini_url)
 
     raise RuntimeError(
-        "DATABASE_URL não definida, _build_db_url() falhou ou retornou vazio, e 'sqlalchemy.url' vazio no alembic.ini. "
-        "Defina DATABASE_URL, implemente _build_db_url() corretamente, ou preencha sqlalchemy.url."
+        "Nenhuma URL de banco encontrada. Defina ALEMBIC_DATABASE_URL ou DATABASE_URL, "
+        "implemente _build_db_url() corretamente, ou configure sqlalchemy.url no alembic.ini."
     )
 
 def run_migrations_offline() -> None:
-    """Executa migrações em modo 'offline' (sem engine real)."""
+    """Run migrations in 'offline' mode."""
     url = _get_db_url()
-    url = _with_sslmode(url)
     context.configure(
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
     )
+
     with context.begin_transaction():
         context.run_migrations()
 
-
 def run_migrations_online() -> None:
-    """Executa migrações em modo 'online' (com conexão real)."""
-    resolved_url = _with_sslmode(_get_db_url())
-    connectable = engine_from_config(
-        {**config.get_section(config.config_ini_section, {}), "sqlalchemy.url": resolved_url},
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    """Run migrations in 'online' mode."""
+    connectable = sa.create_engine(_get_db_url())
+
     with connectable.connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata)
+
         with context.begin_transaction():
             context.run_migrations()
-
 
 if context.is_offline_mode():
     run_migrations_offline()
