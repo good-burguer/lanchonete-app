@@ -6,3 +6,6 @@ class PagamentoAtualizaWebhookSchema(BaseModel):
 
 class PagamentoCreateSchema(BaseModel):
     pedido_id: int
+
+class PagamentoUpdateSchema(BaseModel):
+    status: int
