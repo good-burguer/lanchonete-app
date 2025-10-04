@@ -1,7 +1,7 @@
 from fastapi import status, HTTPException, Response
 
 from app.use_cases.pagamento_use_case import PagamentoUseCase
-from app.adapters.dto.pagamento_dto import PagamentoCreateSchema
+from app.adapters.dto.pagamento_dto import PagamentoCreateSchema, PagamentoUpdateSchema
 from app.adapters.presenters.pagamento_presenter import PagamentoResponse, PagamentoResponseList
 
 class PagamentoController:
@@ -37,9 +37,9 @@ class PagamentoController:
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-    def atualizar_pagamento(self, codigo: int, pagamento_request):
+    def atualizar_pagamento(self, codigo: str, pagamento_data: PagamentoUpdateSchema):
         try:
-            result = PagamentoUseCase(self.db_session).atualizar_pagamento(codigo=codigo, pagamento_request=pagamento_request)
+            result = PagamentoUseCase(self.db_session).atualizar_pagamento(codigo=codigo, status=pagamento_data.status)
 
             return PagamentoResponse(status='success', data = result)
         except ValueError as e:

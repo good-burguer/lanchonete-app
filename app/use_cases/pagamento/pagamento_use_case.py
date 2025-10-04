@@ -1,6 +1,7 @@
 import uuid
 from app.entities.pagamento.entities import PagamentoEntities
-from app.adapters.schemas.pagamento import PagamentoCreateSchema, PagamentoResponseSchema, PagamentoAtualizaSchema
+from app.adapters.schemas.pagamento import PagamentoResponseSchema, PagamentoAtualizaSchema
+from app.adapters.dto.pagamento_dto import PagamentoCreateSchema
 from app.models.pagamento import Pagamento
 from app.adapters.enums.status_pagamento import PagamentoStatusEnum
 

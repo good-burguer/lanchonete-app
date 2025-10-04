@@ -4,12 +4,13 @@ from app.entities.pagamento.entities import PagamentoEntities
 from app.models.pagamento import Pagamento
 from typing import List, Optional
 from app.dao.pagamento_dao import PagamentoDAO
+from app.adapters.dto.pagamento_dto import PagamentoCreateSchema
 
 class PagamentoGateway(PagamentoEntities):
     def __init__(self, db_session):
         self.dao = PagamentoDAO(db_session)
 
-    def criar_pagamento(self, pagamento: Pagamento) -> Pagamento:
+    def criar_pagamento(self, pagamento: PagamentoCreateSchema) -> Pagamento:
         
         return self.dao.criar_pagamento(pagamento)
     
@@ -21,9 +22,9 @@ class PagamentoGateway(PagamentoEntities):
         
         return self.dao.listar_todos_pagamentos()
     
-    def atualizar_pagamento(self, pagamentoDTO) -> Pagamento: 
+    def atualizar_pagamento(self, codigo, status) -> Pagamento: 
         
-        return self.dao.atualizar_pagamento(pagamentoDTO)
+        return self.dao.atualizar_pagamento(codigo, status)
     
     def deletar_pagamento(self, codigo_pagamento: str): 
         

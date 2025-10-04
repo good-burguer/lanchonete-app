@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.infrastructure.db.database import get_db
 from app.gateways.pagamento_gateway import PagamentoGateway
 from app.adapters.presenters.pagamento_presenter import PagamentoResponse
-from app.adapters.dto.pagamento_dto import PagamentoCreateSchema
+from app.adapters.dto.pagamento_dto import PagamentoCreateSchema, PagamentoUpdateSchema
 from app.controllers.pagamento_controller import PagamentoController
 
 router = APIRouter(prefix="/pagamento", tags=["pagamento"])
@@ -115,10 +115,10 @@ def listar_pagamentos(gateway: PagamentoGateway = Depends(get_pagamento_gateway)
         }
     }
 })
-def atualizar_pagamento(codigo_pagamento: str, pagamento_data: PagamentoResponse, gateway: PagamentoGateway = Depends(get_pagamento_gateway)):
+def atualizar_pagamento(codigo_pagamento: str, pagamento_data: PagamentoUpdateSchema, gateway: PagamentoGateway = Depends(get_pagamento_gateway)):
     try:
-        
-        return PagamentoController(db_session=gateway).atualizar_pagamento(codigo=codigo_pagamento, pagamento_request=pagamento_data)
+
+        return PagamentoController(db_session=gateway).atualizar_pagamento(codigo=codigo_pagamento, pagamento_data=pagamento_data)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
