@@ -47,7 +47,7 @@ class PagamentoUseCase:
     def deletar_pagamento(self, codigo_pagamento: str): 
         self.pagamento_entity.deletar_pagamento(codigo_pagamento=codigo_pagamento)
 
-    def _response_schema(pagamento) : 
+    def _response_schema(self, pagamento) : 
         
         return (PagamentoResponseSchema(
                 pedido_id=pagamento.pedido, 
